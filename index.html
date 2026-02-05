@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>روزشمار خدمت سربازی</title>
+
+ <!-- Favicon -->
+    <link rel="icon" type="image/png" href="favicon.png">
+
+<style>
+body{
+    font-family:tahoma;
+    background:linear-gradient(135deg,#1a2a6c,#b21f1f,#fdbb2d);
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+.container{
+    background:#fff;
+    width:100%;
+    max-width:420px;
+    padding:20px;
+    border-radius:15px;
+    box-shadow:0 10px 25px rgba(0,0,0,.2);
+}
+h1{
+    text-align:center;
+    color:#1a2a6c;
+    margin-bottom:20px;
+}
+label{
+    display:block;
+    margin:10px 0 5px;
+    font-weight:bold;
+}
+input,select{
+    width:100%;
+    padding:10px;
+    border-radius:8px;
+    border:1px solid #ccc;
+}
+button{
+    width:100%;
+    padding:12px;
+    margin-top:15px;
+    background:#1a2a6c;
+    color:#fff;
+    border:none;
+    border-radius:8px;
+    font-size:16px;
+    cursor:pointer;
+}
+.result{
+    margin-top:20px;
+    display:none;
+}
+.progress{
+    background:#eee;
+    border-radius:10px;
+    overflow:hidden;
+    margin-top:10px;
+}
+.progress-bar{
+    height:16px;
+    background:#1a2a6c;
+    width:0%;
+}
+.small{
+    font-size:13px;
+    color:#666;
+    text-align:center;
+    margin-top:10px;
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+<h1>روزشمار خدمت</h1>
+
+<label>تاریخ اعزام</label>
+<input type="text" id="startDate" readonly>
+
+<label>مدت خدمت</label>
+<select id="months">
+<option value="21">۲۱ ماه</option>
+<option value="24">۲۴ ماه</option>
+</select>
+
+<label>کسری خدمت (روز)</label>
+<input type="number" id="kasri" value="0">
+
+<button onclick="calc()">محاسبه</button>
+
+<div class="result" id="result">
+<hr>
+<p>📅 تاریخ امروز: <span id="today"></span></p>
+<p>🏁 تاریخ پایان: <span id="endDate"></span></p>
+<p>⏳ روز باقی‌مانده: <span id="remain"></span></p>
+<p>📊 درصد پیشرفت: <span id="percent"></span>%</p>
+
+<div class="progress">
+<div class="progress-bar" id="bar"></div>
+</div>
+</div>
+
+<p class="small">ساخته شده با ❤️ برای سربازها</p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/persian-date@1.0.6/dist/persian-date.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/js/persian-datepicker.min.js"></script>
+
+<script>
+$("#startDate").persianDatepicker({
+    format: 'YYYY/MM/DD',
+    initialValueType: 'persian',
+    autoClose:true,
+    maxDate: 1420/12/29
+});
+
+function calc(){
+    let start = $("#startDate").val();
+    if(!start){ alert("تاریخ اعزام رو انتخاب کن"); return; }
+
+    let months = parseInt(document.getElementById("months").value);
+    let kasri = parseInt(document.getElementById("kasri").value || 0);
+
+    let startDate = new persianDate(start).toDate();
+    let totalDays = months * 30 - kasri;
+
+    let endDate = new Date(startDate);
+    endDate.setDate(endDate.getDate() + totalDays);
+
+    let today = new Date();
+    let remain = Math.ceil((endDate - today) / (1000*60*60*24));
+    if(remain < 0) remain = 0;
+
+    let passed = totalDays - remain;
+    let percent = Math.round((passed / totalDays) * 100);
+
+    document.getElementById("today").innerText =
+        new persianDate(today).format("YYYY/MM/DD");
+    document.getElementById("endDate").innerText =
+        new persianDate(endDate).format("YYYY/MM/DD");
+    document.getElementById("remain").innerText = remain + " روز";
+    document.getElementById("percent").innerText = percent;
+
+    document.getElementById("bar").style.width = percent + "%";
+    document.getElementById("result").style.display="block";
+}
+</script>
+</body>
+</html>
