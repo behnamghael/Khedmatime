@@ -1,6 +1,6 @@
 {
   "name": "Khedmatime",
-  "short_name": "ÎÏãÊÊÇíã",
+  "short_name": "Ø®Ø¯Ù…Øª Ø´Ù…Ø§Ø±",
   "start_url": ".",
   "display": "standalone",
   "background_color": "#1a2a6c",
@@ -18,3 +18,4 @@
     }
   ]
 }
+
