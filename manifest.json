@@ -1,7 +1,7 @@
 {
   "name": "KhedmatShomat",
   "short_name": "K-Count",
-  "description": "A simple app to track your military service and calculate remaining service time.",
+ "description": "Track your military service and remaining time."
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
@@ -19,3 +19,4 @@
     }
   ]
 }
+
