@@ -1,6 +1,6 @@
 {
   "name": "Khedmatime",
-  "short_name": "خدمت شمار",
+  "short_name": "K-Count",
   "start_url": ".",
   "display": "standalone",
   "background_color": "#1a2a6c",
@@ -18,4 +18,5 @@
     }
   ]
 }
+
 
