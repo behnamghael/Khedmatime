@@ -2,7 +2,7 @@
 <html lang="fa" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<title>خدمت شمار</title>
+<title>禺丿賲鬲 卮賲丕乇</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="https://cdn.jsdelivr.net/npm/jalaali-js@1.2.6/dist/jalaali.min.js"></script>
 
@@ -34,6 +34,192 @@ h2{
     margin-bottom:12px;
     text-align:center;
 }
+.today{
+    text-align:center;
+    margin-bottom:20px;
+    font-weight:bold;
+    color:#555;
+}
+label{
+    display:block;
+    margin-top:15px;
+    font-weight:bold;
+}
+select,input,button{
+    width:100%;
+    padding:10px;
+    margin-top:6px;
+    border-radius:8px;
+    border:1px solid #ccc;
+    font-size:15px;
+}
+select{ direction:ltr; }
+button{
+    margin-top:22px;
+    background:#1a2a6c;
+    color:#fff;
+    border:none;
+    cursor:pointer;
+    font-weight:bold;
+    transition:0.3s;
+}
+button:hover{
+    background:#fdbb2d;
+    color:#1a2a6c;
+}
+.result{
+    margin-top:25px;
+    background:#f3f5fb;
+    padding:18px;
+    border-radius:12px;
+    display:none;
+}
+.result div{margin-bottom:10px;font-size:15px;}
+.highlight{font-weight:bold;color:#b21f1f;}
+.progress-box{
+    margin-top:10px;
+    background:#e9ecef;
+    border-radius:25px;
+    overflow:hidden;
+}
+.progress-bar{
+    height:20px;
+    width:0%;
+    transition:width 0.8s, background 0.8s;
+}
+.tally-group{display:inline-block;position:relative;width:42px;height:34px;margin:6px;vertical-align:middle}.tally-group .v{position:absolute;bottom:0;width:2px;height:30px;background:#222}.tally-group .v:nth-child(1){left:4px}.tally-group .v:nth-child(2){left:14px}.tally-group .v:nth-child(3){left:24px}.tally-group .v:nth-child(4){left:34px}.tally-group .slash{position:absolute;left:0;top:14px;width:40px;height:2px;background:#d32f2f;transform:rotate(-55deg);transform-origin:left center}#tallyMarks{margin-top:10px}.footer{
+    text-align:center;
+    margin-top:15px;
+    font-size:13px;
+    color:#777;
+}
+</style>
+</head>
+<body>
+<div class="box">
+<h2>乇賵夭卮賲丕乇 禺丿賲鬲 爻乇亘丕夭蹖 倬蹖卮乇賮鬲賴</h2>
+<div class="today" id="todayDate"></div>
+
+<label>鬲丕乇蹖禺 丕毓夭丕賲 (卮賲爻蹖)</label>
+<div style="display:flex; gap:5px;">
+    <select id="year"></select>
+    <select id="month"></select>
+    <select id="day"></select>
+</div>
+
+<label>賲丿鬲 禺丿賲鬲</label>
+<select id="months">
+<option value="21">21 賲丕賴</option>
+<option value="24">24 賲丕賴</option>
+</select>
+
+<label>丕囟丕賮賴 禺丿賲鬲 (乇賵夭)</label>
+<input type="number" id="penalty" value="0">
+
+<label>讴爻乇蹖 / 賲乇禺氐蹖 (乇賵夭)</label>
+<input type="number" id="reduction" value="0">
+
+<button onclick="calculate()">賲丨丕爻亘賴</button>
+
+<div class="result" id="result">
+<div>馃搮 鬲丕乇蹖禺 倬丕蹖丕賳 禺丿賲鬲: <span class="highlight" id="endDate"></span></div>
+<div>鈴� 乇賵夭賴丕蹖 亘丕賯蹖鈥屬呚з嗀�: <span class="highlight" id="daysLeft"></span></div>
+<div>馃搳 丿乇氐丿 倬蹖卮乇賮鬲 禺丿賲鬲: <span class="highlight" id="progressText"></span></div>
+<div>馃 趩賵亘鈥屫� 禺丿賲鬲:</div><div id="tallyMarks"></div><div class="progress-box">
+    <div class="progress-bar" id="progressBar"></div>
+</div>
+</div>
+
+<div class="footer">亘丕 鉂わ笍 亘乇丕蹖 爻乇亘丕夭賴丕 - 讴賲丕 賳夭賳 賲蹖诏匕乇賴</div>
+</div>
+
+<script>
+(function showToday(){
+    const now = new Date();
+    const j = jalaali.toJalaali(now.getFullYear(), now.getMonth()+1, now.getDate());
+    document.getElementById("todayDate").textContent =
+        `丕賲乇賵夭: ${j.jy}-${String(j.jm).padStart(2,"0")}-${String(j.jd).padStart(2,"0")}`;
+})();
+
+(function fillDateSelectors(){
+    const yearSelect = document.getElementById("year");
+    const monthSelect = document.getElementById("month");
+    const daySelect = document.getElementById("day");
+    const now = new Date();
+    const jNow = jalaali.toJalaali(now.getFullYear(), now.getMonth()+1, now.getDate());
+
+    for(let y=1400; y<=1420; y++) yearSelect.add(new Option(y, y));
+    for(let m=1; m<=12; m++) monthSelect.add(new Option(m, m));
+    for(let d=1; d<=31; d++) daySelect.add(new Option(d, d));
+
+    yearSelect.value = jNow.jy;
+    monthSelect.value = jNow.jm;
+    daySelect.value = jNow.jd;
+})();
+
+
+function makeTally(days){
+ let h="",g=Math.floor(days/5),r=days%5;
+ for(let i=0;i<g;i++){h+=`<span class="tally-group"><span class="v"></span><span class="v"></span><span class="v"></span><span class="v"></span><span class="slash"></span></span>`;}
+ if(r){h+='<span class="tally-group">';for(let i=0;i<r;i++)h+='<span class="v"></span>';h+='</span>';}
+ return h;
+}
+function calculate(){
+    const jy = parseInt(document.getElementById("year").value);
+    const jm = parseInt(document.getElementById("month").value);
+    const jd = parseInt(document.getElementById("day").value);
+
+    const months = parseInt(document.getElementById("months").value);
+    const penalty = parseInt(document.getElementById("penalty").value);
+    const reduction = parseInt(document.getElementById("reduction").value);
+
+    const gStart = jalaali.toGregorian(jy,jm,jd);
+    let startDate = new Date(gStart.gy, gStart.gm-1, gStart.gd);
+    startDate.setHours(0,0,0,0);
+
+    let endDate = new Date(startDate);
+    endDate.setMonth(endDate.getMonth() + months);
+    endDate.setDate(endDate.getDate() + penalty - reduction);
+    endDate.setHours(0,0,0,0);
+
+    const today = new Date();
+    today.setHours(0,0,0,0);
+
+    const totalDays = Math.round((endDate - startDate) / (1000*60*60*24));
+    let passedDays = Math.round((today - startDate) / (1000*60*60*24));
+    if(passedDays < 0) passedDays = 0;
+    if(passedDays > totalDays) passedDays = totalDays;
+
+    const daysLeft = totalDays - passedDays;
+    let progress = Math.round((passedDays / totalDays) * 100);
+
+    let color = "#ff4d4d";
+    if(progress >= 75) color = "#28a745";
+    else if(progress >= 25) color = "#ffc107";
+
+    const jEnd = jalaali.toJalaali(endDate.getFullYear(), endDate.getMonth()+1, endDate.getDate());
+    const endStr = `${jEnd.jy}-${String(jEnd.jm).padStart(2,"0")}-${String(jEnd.jd).padStart(2,"0")}`;
+
+    document.getElementById("endDate").textContent = endStr;
+
+    if(daysLeft === 0){
+        document.getElementById("daysLeft").textContent = "倬丕蹖丕賳 蹖丕賮鬲賴 馃帀";
+        progress = 100;
+    } else {
+        document.getElementById("daysLeft").textContent = daysLeft + " 乇賵夭";
+    }
+
+    document.getElementById("progressText").textContent = progress + "侏";
+ document.getElementById("tallyMarks").innerHTML=makeTally(passedDays);
+    const bar = document.getElementById("progressBar");
+    bar.style.width = progress + "%";
+    bar.style.background = color;
+
+    document.getElementById("result").style.display="block";
+}
+</script>
+</body>
+</html>
 .today{
     text-align:center;
     margin-bottom:20px;
